@@ -38,6 +38,7 @@ COLORS = {
     'burgundy':'6D1C1C',
     'darkgreen':'1B5E20',
     'gray':    '424242',
+    'muted':   '757575',
     'white':   'FFFFFF',
     'lightgray':'F5F5F5',
     'pass_green': 'C8E6C9',
@@ -561,10 +562,64 @@ def _write_historique(wb: Workbook, batches: list):
         _set_col_width(ws, ci, 16)
 
 
+def _write_qc_lab(wb: Workbook, df_lab: pd.DataFrame, cfg: dict):
+    """
+    Write QC_LABO sheet — informational only.
+    These are QC samples from the lab (QC_Source='LAB'), not from our field program.
+    They are displayed for reference but not used for validation.
+    """
+    ws = wb.create_sheet('QC_LABO')
+    ws.sheet_properties.tabColor = TAB_COLORS['gray']
+    
+    elem_prio = cfg.get('elements_prioritaires', ['Ta', 'Nb', 'Ti', 'Rb'])
+    
+    # Title
+    ws.cell(row=1, column=1, value='QC LABORATOIRE — Informatif').font = Font(
+        name='Calibri', bold=True, size=14, color=COLORS['gray'])
+    ws.cell(row=2, column=1, value='Ces QC appartiennent au laboratoire et ne sont pas utilisés pour la validation.').font = Font(
+        name='Calibri', italic=True, size=9, color=COLORS['muted'])
+    
+    # Summary stats
+    n_lab = len(df_lab)
+    n_lab_blk = len(df_lab[df_lab['QAQCType'] == 'BLK']) if 'QAQCType' in df_lab.columns else 0
+    n_lab_std = len(df_lab[df_lab['QAQCType'] == 'STD']) if 'QAQCType' in df_lab.columns else 0
+    
+    ws.cell(row=4, column=1, value=f'Total QC Labo: {n_lab} | Blancs: {n_lab_blk} | Standards: {n_lab_std}').font = Font(bold=True)
+    
+    # Column selection
+    meta_cols = ['SampleID', 'HoleID', 'SiteID', 'ActivityType', 'From_m', 'To_m',
+                 'SampleType', 'QAQCType', 'IDBlk', 'IDStd', 'Method', 'Instrument']
+    meta_cols = [c for c in meta_cols if c in df_lab.columns]
+    
+    elem_cols = [f'{e}_ppm' for e in elem_prio if f'{e}_ppm' in df_lab.columns]
+    all_cols = meta_cols + elem_cols
+    headers = [c.replace('_ppm', '') if c.endswith('_ppm') else c for c in all_cols]
+    
+    _write_header_row(ws, 6, headers, COLORS['gray'])
+    
+    # Data rows
+    for ri, (_, row) in enumerate(df_lab[all_cols].iterrows(), start=7):
+        for ci, col in enumerate(all_cols, 1):
+            val = row.get(col)
+            if pd.isna(val) or val is None:
+                val = ''
+            cell = ws.cell(row=ri, column=ci, value=val if not isinstance(val, float) or not np.isnan(val) else '')
+            cell.font = _data_font()
+            cell.border = _thin_border()
+    
+    # Column widths
+    for ci, col in enumerate(all_cols, 1):
+        w = 12 if col.endswith('_ppm') else 14
+        _set_col_width(ws, ci, w)
+    
+    ws.freeze_panes = ws.cell(row=7, column=1)
+
+
 # ─── MAIN ENTRY POINT ────────────────────────────────────────────────────────
 
 def write_xlsx(df: pd.DataFrame, qc_results: dict, mode: str,
-               output_dir: Path, zone: str = None, batches: list = None) -> str:
+               output_dir: Path, zone: str = None, batches: list = None,
+               df_lab: pd.DataFrame = None) -> str:
     """
     Write full XLSX report.
     Returns filepath.
@@ -599,6 +654,10 @@ def write_xlsx(df: pd.DataFrame, qc_results: dict, mode: str,
 
     if std_results.get('n_standards', 0) > 0:
         _write_qc_standards(wb, std_results, cfg)
+
+    # ── QC LABO sheet (informational) ──
+    if df_lab is not None and not df_lab.empty:
+        _write_qc_lab(wb, df_lab, cfg)
 
     # ── HISTORIQUE if ≥2 batches ──
     if batches and len(batches) >= 2:
