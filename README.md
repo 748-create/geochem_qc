@@ -1,1 +1,0 @@
-# geochem_qc
