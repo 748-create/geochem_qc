@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoQC Pro</title>
+<style>
+:root {
+  --navy:   #1B2A4A;
+  --navy2:  #243659;
+  --green:  #2D7D46;
+  --cyan:   #0097A7;
+  --orange: #E65100;
+  --purple: #6A1B9A;
+  --pass:   #C8E6C9;
+  --warn:   #FFF9C4;
+  --fail:   #FFCDD2;
+  --bg:     #F0F2F5;
+  --card:   #FFFFFF;
+  --text:   #1A1A2E;
+  --muted:  #6B7280;
+  --border: #E5E7EB;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(27,42,74,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--navy);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.topbar-logo { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; }
+.topbar-logo span { color: #64B5F6; }
+.topbar-actions { display: flex; gap: 12px; }
+.btn-icon { background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.btn-icon:hover { background: rgba(255,255,255,0.2); }
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: calc(100vh - 56px); padding: 32px 24px; max-width: 900px; margin: 0 auto; }
+.screen.active { display: block; }
+
+/* ── CARDS ── */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px; }
+.card-title { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 16px; }
+
+/* ── SCREEN 1: HOME ── */
+.home-title { font-size: 1.6rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.home-sub { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+.mode-grid { display: flex; flex-direction: column; gap: 12px; }
+.mode-btn {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+.mode-btn:hover { border-color: var(--navy); transform: translateX(4px); box-shadow: 0 4px 16px rgba(27,42,74,0.15); }
+.mode-letter { width: 40px; height: 40px; border-radius: 10px; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+.mode-info .mode-name { font-weight: 600; font-size: 0.95rem; color: var(--navy); }
+.mode-info .mode-desc { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+/* ── SCREEN 2: IMPORT ── */
+.screen-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.btn-back { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 14px; cursor: pointer; color: var(--navy); font-size: 0.9rem; transition: all 0.15s; }
+.btn-back:hover { background: var(--navy); color: white; border-color: var(--navy); }
+.screen-title { font-size: 1.3rem; font-weight: 700; color: var(--navy); }
+
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #FAFBFC;
+  margin-bottom: 16px;
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--navy); background: #EEF2FF; }
+.drop-zone.has-files { border-color: var(--green); background: #F0FFF4; }
+.drop-zone-icon { font-size: 2.5rem; margin-bottom: 8px; }
+.drop-zone-label { font-weight: 600; color: var(--navy); }
+.drop-zone-sub { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+.file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.file-item { display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; }
+.file-item-icon { font-size: 1.1rem; }
+.file-item-name { flex: 1; color: var(--text); font-weight: 500; }
+.file-item-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 0 4px; }
+.file-item-remove:hover { color: var(--orange); }
+
+.degraded-banner { background: var(--warn); border: 1.5px solid #F9A825; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #795548; margin-bottom: 12px; display: flex; gap: 8px; align-items: flex-start; }
+
+/* ── BUTTONS ── */
+.btn { border: none; border-radius: 10px; padding: 12px 24px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.18s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--navy); color: white; }
+.btn-primary:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(27,42,74,0.25); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-secondary { background: white; color: var(--navy); border: 1.5px solid var(--border); }
+.btn-secondary:hover { border-color: var(--navy); }
+.btn-success { background: var(--green); color: white; }
+.btn-success:hover { background: #236338; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+/* ── SCREEN 3: PRE-ANALYSIS ── */
+.pre-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.pre-item { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; padding: 8px 12px; border-radius: 8px; }
+.pre-item.ok { background: #F0FFF4; color: var(--green); }
+.pre-item.warn { background: var(--warn); color: #795548; }
+.pre-item.info { background: #EEF2FF; color: var(--navy); }
+.pre-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+.conflict-box { background: #FFF8E1; border: 1.5px solid #F9A825; border-radius: 10px; padding: 16px 20px; margin-top: 12px; }
+.conflict-question { font-weight: 600; margin-bottom: 12px; font-size: 0.9rem; }
+.conflict-options { display: flex; flex-direction: column; gap: 8px; }
+.conflict-option { background: white; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; cursor: pointer; font-size: 0.88rem; text-align: left; transition: all 0.15s; }
+.conflict-option:hover { border-color: var(--navy); background: #EEF2FF; }
+.conflict-option.selected { border-color: var(--green); background: #F0FFF4; }
+
+/* ── SCREEN 4: PROGRESS ── */
+.progress-wrap { margin: 20px 0; }
+.progress-bar-bg { background: #E5E7EB; border-radius: 100px; height: 20px; overflow: hidden; }
+.progress-bar { background: linear-gradient(90deg, var(--navy), var(--cyan)); height: 100%; border-radius: 100px; transition: width 0.4s ease; }
+.progress-pct { text-align: right; font-weight: 700; color: var(--navy); margin-top: 6px; font-size: 1.1rem; }
+.progress-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+.step-item { display: flex; gap: 10px; align-items: center; font-size: 0.88rem; padding: 8px 12px; border-radius: 8px; }
+.step-item.done { background: #F0FFF4; color: var(--green); }
+.step-item.active { background: #EEF2FF; color: var(--navy); animation: pulse 1.5s infinite; }
+.step-item.pending { color: var(--muted); }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+/* ── SCREEN 5: RESULT ── */
+.result-status { text-align: center; padding: 24px; border-radius: var(--radius); margin-bottom: 20px; }
+.result-status.PASS { background: var(--pass); }
+.result-status.WARN { background: var(--warn); }
+.result-status.FAIL { background: var(--fail); }
+.result-status-icon { font-size: 3rem; margin-bottom: 8px; }
+.result-status-label { font-size: 1.5rem; font-weight: 700; }
+.result-status.PASS .result-status-label { color: var(--green); }
+.result-status.WARN .result-status-label { color: #F57F17; }
+.result-status.FAIL .result-status-label { color: #C62828; }
+
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.result-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; }
+.result-card-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; }
+.result-card-value { font-size: 1.5rem; font-weight: 700; color: var(--navy); margin: 4px 0; }
+.result-card-sub { font-size: 0.8rem; color: var(--muted); }
+.result-card.FAIL { border-color: #EF9A9A; background: #FFF5F5; }
+.result-card.WARN { border-color: #FFE082; background: #FFFDE7; }
+.result-card.PASS { border-color: #A5D6A7; background: #F1F8E9; }
+
+.issues-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.issue-item { display: flex; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; }
+.issue-item.fail { background: var(--fail); color: #C62828; }
+.issue-item.warn { background: var(--warn); color: #795548; }
+.issue-icon { flex-shrink: 0; }
+
+.rec-list { display: flex; flex-direction: column; gap: 6px; }
+.rec-item { padding: 8px 14px; background: #EEF2FF; border-radius: 8px; font-size: 0.88rem; color: var(--navy); border-left: 3px solid var(--navy); }
+
+.download-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.btn-dl { display: flex; align-items: center; gap: 8px; padding: 14px 20px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; }
+.btn-dl-xlsx { background: #2D7D46; color: white; }
+.btn-dl-pdf { background: #C62828; color: white; }
+.btn-dl-json { background: #1565C0; color: white; }
+.btn-dl:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+/* ── SETTINGS MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: var(--radius); padding: 28px; max-width: 520px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal-title { font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+.form-row { margin-bottom: 16px; }
+.form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.form-input { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.9rem; transition: border-color 0.15s; }
+.form-input:focus { outline: none; border-color: var(--navy); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ── LOG PANEL ── */
+.log-panel { background: #1A1A2E; color: #A8D5A2; border-radius: 10px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.78rem; max-height: 200px; overflow-y: auto; margin-top: 16px; }
+.log-line { line-height: 1.5; }
+.log-line.warn { color: #FFE082; }
+.log-line.error { color: #EF9A9A; }
+
+/* ── UTILS ── */
+.section-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+.tag-pass { background: var(--pass); color: var(--green); }
+.tag-warn { background: var(--warn); color: #795548; }
+.tag-fail { background: var(--fail); color: #C62828; }
+
+@media (max-width: 600px) {
+  .result-grid { grid-template-columns: 1fr; }
+  .screen { padding: 20px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">Geo<span>QC</span> Pro</div>
+  <div class="topbar-actions">
+    <button class="btn-icon" onclick="openSettings()" title="Settings">⚙</button>
+    <button class="btn-icon" onclick="openHistory()" title="History">📋</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 1 — HOME
+═══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-title">Que veux-tu faire ?</div>
+  <div class="home-sub">Sélectionne un mode de traitement</div>
+  <div class="mode-grid" id="mode-grid"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 2 — IMPORT
+═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-import">
+  <div class="screen-header">
+    <button class="btn-back" onclick="goHome()">← Retour</button>
+    <div class="screen-title" id="import-title">Import</div>
+  </div>
+
+  <!-- Dispatch zone -->
+  <div class="card">
+    <div class="card-title">📋 Fichier dispatch <span style="color:var(--muted);font-weight:400;font-size:0.82rem">(optionnel mais recommandé)</span></div>
+    <div class="drop-zone" id="dz-dispatch" onclick="triggerInput('input-dispatch')">
+      <div class="drop-zone-icon">📋</div>
+      <div class="drop-zone-label">Glisser le dispatch ici</div>
+      <div class="drop-zone-sub">ou cliquer pour sélectionner — Excel, CSV</div>
+      <div class="file-list" id="fl-dispatch"></div>
+    </div>
+    <input type="file" id="input-dispatch" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleDispatch(this)">
+    <div class="degraded-banner" id="degraded-notice" style="display:none">
+      ⚠ Sans dispatch : SampleTypes et masses déduits automatiquement. Le QC reste fonctionnel mais moins précis.
+    </div>
+  </div>
+
+  <!-- Analytical files zone -->
+  <div class="card">
+    <div class="card-title">📊 Résultats analytiques <span style="color:#C62828;font-size:0.82rem">*obligatoire</span></div>
+    <div class="drop-zone" id="dz-analytical" onclick="triggerInput('input-analytical')">
+      <div class="drop-zone-icon">📊</div>
+      <div class="drop-zone-label">Glisser les fichiers analytiques ici</div>
+      <div class="drop-zone-sub">pXRF, ICP-MS, LIBS — CSV, XLS, XLSX — plusieurs fichiers acceptés</div>
+      <div class="file-list" id="fl-analytical"></div>
+    </div>
+    <input type="file" id="input-analytical" accept=".csv,.xls,.xlsx,.txt" multiple style="display:none" onchange="handleAnalytical(this)">
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btn-preanalyse" onclick="runPreAnalysis()" disabled>
+      → Pré-analyser
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 3 — PRE-ANALYSIS
+═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-preanalysis">
+  <div class="screen-header">
+    <button class="btn-back" onclick="showScreen('screen-import')">← Modifier</button>
+    <div class="screen-title">Ce que j'ai compris</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">✓ Détecté</div>
+    <ul class="pre-list" id="pre-confirmed"></ul>
+  </div>
+
+  <div class="card" id="pre-warnings-card" style="display:none">
+    <div class="section-label">⚠ À noter</div>
+    <ul class="pre-list" id="pre-warnings"></ul>
+  </div>
+
+  <div class="card" id="pre-conflict-card" style="display:none">
+    <div class="section-label">❓ Une question</div>
+    <div class="conflict-box">
+      <div class="conflict-question" id="conflict-question"></div>
+      <div class="conflict-options" id="conflict-options"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btn-skip-conflict" onclick="skipConflict()">Passer</button>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btn-generate" onclick="startProcessing()">
+      ⚡ Générer le rapport
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 4 — PROGRESS
+═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-progress">
+  <div class="card" style="text-align:center;padding:32px">
+    <div style="font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:24px">Traitement en cours...</div>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" id="progress-pct">0%</div>
+    </div>
+    <div style="color:var(--muted);font-size:0.9rem;margin-top:8px" id="progress-msg">Initialisation...</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Étapes</div>
+    <div class="progress-steps" id="progress-steps"></div>
+  </div>
+
+  <div class="log-panel" id="log-panel">
+    <div class="log-line">GeoQC Pro démarré...</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCREEN 5 — RESULT
+═══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-result">
+  <div class="screen-header">
+    <button class="btn-back" onclick="goHome()">← Nouveau batch</button>
+    <div class="screen-title">Résultat</div>
+  </div>
+
+  <div class="result-status" id="result-status">
+    <div class="result-status-icon" id="result-icon">✅</div>
+    <div class="result-status-label" id="result-label">BATCH VALIDÉ</div>
+    <div style="font-size:0.9rem;margin-top:8px;opacity:0.8" id="result-sub"></div>
+  </div>
+
+  <div class="result-grid" id="result-grid"></div>
+
+  <div class="card" id="issues-card" style="display:none">
+    <div class="card-title">Problèmes détectés</div>
+    <div class="issues-list" id="issues-list"></div>
+  </div>
+
+  <div class="card" id="recs-card" style="display:none">
+    <div class="card-title">Recommandations</div>
+    <div class="rec-list" id="rec-list"></div>
+  </div>
+
+  <div class="download-row" id="download-row"></div>
+
+  <div class="log-panel" id="result-log" style="margin-top:20px"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SETTINGS MODAL
+═══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-title">⚙ Paramètres</div>
+    <div class="form-row">
+      <label class="form-label">RPD Warning (%)</label>
+      <input type="number" class="form-input" id="cfg-rpd-warn" value="10">
+    </div>
+    <div class="form-row">
+      <label class="form-label">RPD Fail (%)</label>
+      <input type="number" class="form-input" id="cfg-rpd-fail" value="20">
+    </div>
+    <div class="form-row">
+      <label class="form-label">STD Pass min (%recovery)</label>
+      <input type="number" class="form-input" id="cfg-std-min" value="90">
+    </div>
+    <div class="form-row">
+      <label class="form-label">STD Pass max (%recovery)</label>
+      <input type="number" class="form-input" id="cfg-std-max" value="110">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Éléments prioritaires (séparés par virgule)</label>
+      <input type="text" class="form-input" id="cfg-elements" value="Ta,Nb,Ti,Rb">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeSettings()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="history-modal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-title">📋 Historique des batches</div>
+    <div id="history-content" style="font-size:0.88rem;color:var(--muted)">Chargement...</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('history-modal').classList.remove('open')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+const state = {
+  mode: null,
+  dispatchFileId: null,
+  analyticalFileIds: [],
+  preAnalysisData: null,
+  conflictResolutions: {},
+  currentConflictIdx: 0,
+  jobId: null,
+  result: null,
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// MODES CONFIG
+// ═══════════════════════════════════════════════════════════════════
+const MODES = [
+  { id:'A', name:'Nouveau batch', desc:'Traitement standard complet — pXRF, ICP, LIBS' },
+  { id:'B', name:'Comparer deux runs', desc:'Même batch réanalysé — détecter les dérives instrument' },
+  { id:'C', name:'Comparer deux méthodes', desc:'pXRF vs ICP / LIBS vs XRF — biais inter-méthodes' },
+  { id:'D', name:'Comparer deux labos', desc:'ALS vs MSALabs / même méthode — biais inter-labos' },
+  { id:'E', name:'Ajouter à un batch existant', desc:'Nouveaux résultats reçus — fusionner au batch' },
+  { id:'F', name:'Recalculer / Valider', desc:'Changer seuils ou regénérer les rapports' },
+  { id:'G', name:'Composite par puit', desc:'Agréger les couches par puit (pondération masse)' },
+  { id:'H', name:'Comparer deux campagnes', desc:'Même zone — périodes différentes' },
+];
+
+const STEPS = [
+  'Parsing fichiers', 'Lecture dispatch', 'Fusion données',
+  'Nettoyage', 'Score QC', 'QC Duplicates',
+  'QC Blanks', 'QC Standards', 'Génération XLSX', 'Génération PDF'
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Render mode buttons
+  const grid = document.getElementById('mode-grid');
+  MODES.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'mode-btn';
+    btn.innerHTML = `
+      <div class="mode-letter">${m.id}</div>
+      <div class="mode-info">
+        <div class="mode-name">${m.name}</div>
+        <div class="mode-desc">${m.desc}</div>
+      </div>
+    `;
+    btn.onclick = () => selectMode(m.id);
+    grid.appendChild(btn);
+  });
+
+  // Drag-and-drop
+  setupDropZone('dz-dispatch', false);
+  setupDropZone('dz-analytical', true);
+
+  // Load settings
+  loadSettings();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goHome() {
+  state.mode = null;
+  state.dispatchFileId = null;
+  state.analyticalFileIds = [];
+  state.preAnalysisData = null;
+  state.conflictResolutions = {};
+  showScreen('screen-home');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODE SELECTION
+// ═══════════════════════════════════════════════════════════════════
+function selectMode(modeId) {
+  state.mode = modeId;
+  const m = MODES.find(x => x.id === modeId);
+  document.getElementById('import-title').textContent = `Mode ${modeId} — ${m.name}`;
+  // Reset file lists
+  document.getElementById('fl-dispatch').innerHTML = '';
+  document.getElementById('fl-analytical').innerHTML = '';
+  document.getElementById('dz-dispatch').classList.remove('has-files');
+  document.getElementById('dz-analytical').classList.remove('has-files');
+  document.getElementById('degraded-notice').style.display = 'none';
+  document.getElementById('btn-preanalyse').disabled = true;
+  showScreen('screen-import');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════════════════════════════
+function triggerInput(id) { document.getElementById(id).click(); }
+
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append(file.name, file);
+  const res = await fetch('/api/upload', { method: 'POST', body: fd });
+  const data = await res.json();
+  return data.files[0];
+}
+
+async function handleDispatch(input) {
+  if (!input.files.length) return;
+  const file = input.files[0];
+  const uploaded = await uploadFile(file);
+  state.dispatchFileId = uploaded.id;
+  document.getElementById('dz-dispatch').classList.add('has-files');
+  document.getElementById('fl-dispatch').innerHTML = `
+    <div class="file-item">
+      <span class="file-item-icon">📋</span>
+      <span class="file-item-name">${file.name}</span>
+      <button class="file-item-remove" onclick="removeDispatch()">✕</button>
+    </div>`;
+  document.getElementById('degraded-notice').style.display = 'none';
+  updatePreAnalyseBtn();
+}
+
+async function handleAnalytical(input) {
+  if (!input.files.length) return;
+  const fl = document.getElementById('fl-analytical');
+  for (const file of input.files) {
+    const uploaded = await uploadFile(file);
+    state.analyticalFileIds.push(uploaded.id);
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.dataset.id = uploaded.id;
+    item.innerHTML = `
+      <span class="file-item-icon">${fileIcon(file.name)}</span>
+      <span class="file-item-name">${file.name}</span>
+      <button class="file-item-remove" onclick="removeAnalytical('${uploaded.id}', this)">✕</button>`;
+    fl.appendChild(item);
+  }
+  document.getElementById('dz-analytical').classList.add('has-files');
+  updatePreAnalyseBtn();
+}
+
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (ext === 'csv') return '📄';
+  if (ext === 'xlsx' || ext === 'xls') return '📊';
+  return '📁';
+}
+
+function removeDispatch() {
+  state.dispatchFileId = null;
+  document.getElementById('fl-dispatch').innerHTML = '';
+  document.getElementById('dz-dispatch').classList.remove('has-files');
+  document.getElementById('degraded-notice').style.display = 'flex';
+}
+
+function removeAnalytical(id, btn) {
+  state.analyticalFileIds = state.analyticalFileIds.filter(x => x !== id);
+  btn.closest('.file-item').remove();
+  if (!state.analyticalFileIds.length) {
+    document.getElementById('dz-analytical').classList.remove('has-files');
+  }
+  updatePreAnalyseBtn();
+}
+
+function updatePreAnalyseBtn() {
+  document.getElementById('btn-preanalyse').disabled = state.analyticalFileIds.length === 0;
+  if (!state.dispatchFileId && state.analyticalFileIds.length > 0) {
+    document.getElementById('degraded-notice').style.display = 'flex';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════════════════════
+function setupDropZone(dzId, multiple) {
+  const dz = document.getElementById(dzId);
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', async e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const files = [...e.dataTransfer.files];
+    if (!files.length) return;
+    if (multiple) {
+      // Create a fake input-like object
+      const fakeInput = { files };
+      await handleAnalytical(fakeInput);
+    } else {
+      const fakeInput = { files: [files[0]] };
+      await handleDispatch(fakeInput);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PRE-ANALYSIS
+// ═══════════════════════════════════════════════════════════════════
+async function runPreAnalysis() {
+  document.getElementById('btn-preanalyse').disabled = true;
+  document.getElementById('btn-preanalyse').textContent = '⟳ Analyse...';
+
+  try {
+    const res = await fetch('/api/pre-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        analytical_files: state.analyticalFileIds,
+        dispatch_file: state.dispatchFileId,
+      })
+    });
+    const data = await res.json();
+    state.preAnalysisData = data;
+    renderPreAnalysis(data);
+    showScreen('screen-preanalysis');
+  } catch(e) {
+    alert('Erreur pré-analyse: ' + e.message);
+  } finally {
+    document.getElementById('btn-preanalyse').disabled = false;
+    document.getElementById('btn-preanalyse').textContent = '→ Pré-analyser';
+  }
+}
+
+function renderPreAnalysis(data) {
+  // Confirmed list
+  const confirmed = document.getElementById('pre-confirmed');
+  confirmed.innerHTML = '';
+  (data.confirmed || []).forEach(item => {
+    confirmed.innerHTML += `<li class="pre-item ok"><span class="pre-icon">✓</span>${item}</li>`;
+  });
+
+  // Warnings
+  const warningsCard = document.getElementById('pre-warnings-card');
+  const warnings = document.getElementById('pre-warnings');
+  if (data.warnings && data.warnings.length) {
+    warningsCard.style.display = 'block';
+    warnings.innerHTML = '';
+    data.warnings.forEach(w => {
+      warnings.innerHTML += `<li class="pre-item warn"><span class="pre-icon">⚠</span>${w}</li>`;
+    });
+  } else {
+    warningsCard.style.display = 'none';
+  }
+
+  // Conflicts
+  state.currentConflictIdx = 0;
+  renderCurrentConflict(data);
+}
+
+function renderCurrentConflict(data) {
+  const conflicts = data.all_conflicts || [];
+  const card = document.getElementById('pre-conflict-card');
+
+  if (!conflicts.length || state.currentConflictIdx >= conflicts.length) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const conflict = conflicts[state.currentConflictIdx];
+  card.style.display = 'block';
+  document.getElementById('conflict-question').textContent = conflict.question;
+
+  const opts = document.getElementById('conflict-options');
+  opts.innerHTML = '';
+  conflict.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'conflict-option';
+    btn.textContent = opt.label;
+    btn.onclick = () => {
+      opts.querySelectorAll('.conflict-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.conflictResolutions[conflict.sample_id] = opt.id;
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function skipConflict() {
+  state.currentConflictIdx++;
+  renderCurrentConflict(state.preAnalysisData);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROCESSING
+// ═══════════════════════════════════════════════════════════════════
+async function startProcessing() {
+  showScreen('screen-progress');
+  renderProgressSteps(0);
+  appendLog('🚀 Démarrage du traitement Mode ' + state.mode + '...');
+
+  try {
+    const res = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: state.mode,
+        analytical_files: state.analyticalFileIds,
+        dispatch_file: state.dispatchFileId,
+        conflict_resolutions: state.conflictResolutions,
+      })
+    });
+    const data = await res.json();
+    state.jobId = data.job_id;
+    pollProgress();
+  } catch(e) {
+    appendLog('❌ Erreur: ' + e.message, 'error');
+  }
+}
+
+function pollProgress() {
+  const interval = setInterval(async () => {
+    try {
+      const res = await fetch('/api/progress/' + state.jobId);
+      const data = await res.json();
+
+      updateProgress(data.progress, data.message);
+      if (data.message) appendLog(data.message);
+
+      if (data.status === 'done' || data.status === 'error') {
+        clearInterval(interval);
+        updateProgress(100, 'Terminé !');
+        setTimeout(() => {
+          state.result = data.result;
+          renderResult(data.result);
+          showScreen('screen-result');
+        }, 800);
+      }
+    } catch(e) {
+      clearInterval(interval);
+      appendLog('❌ Erreur polling: ' + e.message, 'error');
+    }
+  }, 800);
+}
+
+function updateProgress(pct, msg) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  if (msg) document.getElementById('progress-msg').textContent = msg;
+  renderProgressSteps(pct);
+}
+
+function renderProgressSteps(pct) {
+  const container = document.getElementById('progress-steps');
+  container.innerHTML = '';
+  const stepsCount = STEPS.length;
+  STEPS.forEach((step, i) => {
+    const threshold = (i / stepsCount) * 100;
+    let cls = 'pending', icon = '○';
+    if (pct >= threshold + (100/stepsCount)) { cls = 'done'; icon = '✓'; }
+    else if (pct >= threshold) { cls = 'active'; icon = '⟳'; }
+    container.innerHTML += `<div class="step-item ${cls}"><span>${icon}</span>${step}</div>`;
+  });
+}
+
+function appendLog(msg, type = '') {
+  const panel = document.getElementById('log-panel');
+  const line = document.createElement('div');
+  line.className = 'log-line' + (type ? ' ' + type : '');
+  const ts = new Date().toLocaleTimeString();
+  line.textContent = `[${ts}] ${msg}`;
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESULT SCREEN
+// ═══════════════════════════════════════════════════════════════════
+function renderResult(result) {
+  if (!result) return;
+
+  const status = result.overall_status || (result.success ? 'PASS' : 'FAIL');
+  const statusEl = document.getElementById('result-status');
+  statusEl.className = 'result-status ' + status;
+  document.getElementById('result-icon').textContent =
+    status === 'PASS' ? '✅' : status === 'WARN' ? '⚠️' : '❌';
+  document.getElementById('result-label').textContent =
+    status === 'PASS' ? 'BATCH VALIDÉ' : status === 'WARN' ? 'BATCH À VÉRIFIER' : 'BATCH PROBLÉMATIQUE';
+  document.getElementById('result-sub').textContent =
+    `Mode ${result.mode || state.mode} — Zone ${result.zone || '?'} — ${result.n_orig || '?'} échantillons ORIG`;
+
+  // Grid cards
+  const grid = document.getElementById('result-grid');
+  grid.innerHTML = '';
+  const comp = result.completeness || {};
+  const qcr = result.qc_results || {};
+  const dup = qcr.duplicates || {};
+  const blk = qcr.blanks || {};
+  const std = qcr.standards || {};
+
+  const cards = [
+    { label: 'Données', value: comp.n_orig || 0, sub: `${comp.n_dup||0} DUP / ${comp.n_blk||0} BLK / ${comp.n_std||0} STD`, status: 'PASS' },
+    { label: 'QC Score', value: comp.score || '?', sub: comp.issues ? comp.issues.join(', ') || 'Aucun problème' : '', status: comp.score === 'COMPLET' ? 'PASS' : comp.score === 'MINIMAL' ? 'FAIL' : 'WARN' },
+    { label: 'Duplicates', value: `${dup.n_pass||0}/${dup.n_pairs||0}`, sub: `${dup.n_fail||0} FAIL — ${dup.n_warn||0} WARN`, status: dup.n_fail > 0 ? 'FAIL' : dup.n_warn > 0 ? 'WARN' : 'PASS' },
+    { label: 'Standards', value: std.n_pass > 0 ? '✓' : (std.n_crms ? '⚠' : '—'), sub: `${std.n_crms||0} CRM(s) analysé(s)`, status: std.n_fail > 0 ? 'FAIL' : std.n_warn > 0 ? 'WARN' : 'PASS' },
+  ];
+
+  cards.forEach(c => {
+    grid.innerHTML += `
+      <div class="result-card ${c.status}">
+        <div class="result-card-label">${c.label}</div>
+        <div class="result-card-value">${c.value}</div>
+        <div class="result-card-sub">${c.sub}</div>
+      </div>`;
+  });
+
+  // Issues
+  const issues = [];
+  (dup.pairs || []).forEach(p => {
+    if (p.overall_status === 'FAIL') {
+      const failEls = Object.entries(p.rpd_values || {})
+        .filter(([,v]) => v.status === 'FAIL')
+        .map(([el, v]) => `${el}=${v.rpd}%`).join(', ');
+      if (failEls) issues.push({ type: 'fail', text: `DUP ${p.dup_id} — RPD: ${failEls}` });
+    }
+  });
+
+  Object.entries(blk.crm_results || {}).forEach(([crm, res]) => {
+    if (res.overall_status !== 'PASS') {
+      Object.entries(res.elements || {}).forEach(([el, er]) => {
+        er.issues?.forEach(iss => issues.push({ type: res.overall_status.toLowerCase(), text: `BLK ${crm} — ${el}: ${iss}` }));
+      });
+    }
+  });
+
+  Object.entries(std.crm_results || {}).forEach(([crm, res]) => {
+    if (res.overall_status !== 'PASS') {
+      Object.entries(res.elements || {}).forEach(([el, er]) => {
+        er.issues?.forEach(iss => issues.push({ type: res.overall_status.toLowerCase(), text: `STD ${crm} — ${el}: ${iss}` }));
+      });
+    }
+  });
+
+  const issuesCard = document.getElementById('issues-card');
+  const issuesList = document.getElementById('issues-list');
+  if (issues.length) {
+    issuesCard.style.display = 'block';
+    issuesList.innerHTML = issues.map(iss =>
+      `<div class="issue-item ${iss.type}"><span class="issue-icon">${iss.type==='fail'?'❌':'⚠️'}</span>${iss.text}</div>`
+    ).join('');
+  } else {
+    issuesCard.style.display = 'none';
+  }
+
+  // Recommendations
+  const recs = [];
+  const failDups = (dup.pairs || []).filter(p => p.overall_status === 'FAIL');
+  if (failDups.length) recs.push(`→ Réanalyser : ${failDups.map(p => p.dup_id).join(', ')}`);
+
+  Object.entries(std.crm_results || {}).forEach(([crm, res]) => {
+    Object.entries(res.elements || {}).forEach(([el, er]) => {
+      if (er.drift) recs.push(`→ Vérifier étalonnage ${el} sur ${crm} (drift ${er.drift.direction})`);
+    });
+  });
+
+  const recsCard = document.getElementById('recs-card');
+  if (recs.length) {
+    recsCard.style.display = 'block';
+    document.getElementById('rec-list').innerHTML = recs.map(r =>
+      `<div class="rec-item">${r}</div>`).join('');
+  } else {
+    recsCard.style.display = 'none';
+  }
+
+  // Download buttons
+  const dlRow = document.getElementById('download-row');
+  dlRow.innerHTML = '';
+  const files = result.output_files || {};
+  if (files.xlsx) {
+    const name = files.xlsx.split('/').pop();
+    dlRow.innerHTML += `<a class="btn-dl btn-dl-xlsx" href="/api/download/${encodeURIComponent(name)}" download>⬇ XLSX</a>`;
+  }
+  if (files.pdf) {
+    const name = files.pdf.split('/').pop();
+    dlRow.innerHTML += `<a class="btn-dl btn-dl-pdf" href="/api/download/${encodeURIComponent(name)}" download>⬇ PDF</a>`;
+  }
+
+  // Log
+  const logEl = document.getElementById('result-log');
+  logEl.innerHTML = (result.log || []).map(l => {
+    const cls = l.includes('❌') || l.includes('⚠') ? ' warn' : '';
+    return `<div class="log-line${cls}">${l}</div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    const s = cfg.seuils || {};
+    document.getElementById('cfg-rpd-warn').value = s.rpd_warn || 10;
+    document.getElementById('cfg-rpd-fail').value = s.rpd_fail || 20;
+    document.getElementById('cfg-std-min').value = s.std_pass_min || 90;
+    document.getElementById('cfg-std-max').value = s.std_pass_max || 110;
+    document.getElementById('cfg-elements').value = (cfg.elements_prioritaires || ['Ta','Nb','Ti','Rb']).join(',');
+  } catch(e) {}
+}
+
+function openSettings() {
+  document.getElementById('settings-modal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+
+async function saveSettings() {
+  try {
+    const res = await fetch('/api/config');
+    const cfg = await res.json();
+    cfg.seuils.rpd_warn = +document.getElementById('cfg-rpd-warn').value;
+    cfg.seuils.rpd_fail = +document.getElementById('cfg-rpd-fail').value;
+    cfg.seuils.std_pass_min = +document.getElementById('cfg-std-min').value;
+    cfg.seuils.std_pass_max = +document.getElementById('cfg-std-max').value;
+    cfg.elements_prioritaires = document.getElementById('cfg-elements').value.split(',').map(s=>s.trim());
+    await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cfg)
+    });
+    closeSettings();
+  } catch(e) { alert('Erreur sauvegarde: ' + e.message); }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════════════════
+async function openHistory() {
+  document.getElementById('history-modal').classList.add('open');
+  try {
+    const res = await fetch('/api/history');
+    const data = await res.json();
+    const batches = data.batches || [];
+    if (!batches.length) {
+      document.getElementById('history-content').textContent = 'Aucun batch archivé.';
+      return;
+    }
+    document.getElementById('history-content').innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+        <thead>
+          <tr style="background:var(--navy);color:white">
+            <th style="padding:8px;text-align:left">Fichier</th>
+            <th style="padding:8px">Zone</th>
+            <th style="padding:8px">Date</th>
+            <th style="padding:8px">Mode</th>
+            <th style="padding:8px">ORIG</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${batches.map(b => `
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:8px;font-family:monospace;font-size:0.8rem">${b.filename}</td>
+              <td style="padding:8px;text-align:center">${b.zone || '?'}</td>
+              <td style="padding:8px;text-align:center">${(b.date||'').substring(0,10)}</td>
+              <td style="padding:8px;text-align:center">${b.mode || '?'}</td>
+              <td style="padding:8px;text-align:center">${b.n_orig || 0}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    document.getElementById('history-content').textContent = 'Erreur chargement historique.';
+  }
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

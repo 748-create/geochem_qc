@@ -1,0 +1,386 @@
+{
+  "OREAS20a": {
+    "description": "Granodiorite barren lithogeochem",
+    "matrix": "granodiorite",
+    "methods": {
+      "ME-MS89L": {
+        "Ag": {"certified": null, "1SD": null},
+        "Al": {"certified": 8.17, "1SD": 0.08},
+        "As": {"certified": 4.5, "1SD": 0.5},
+        "Ba": {"certified": 452, "1SD": 11},
+        "Be": {"certified": 3.2, "1SD": 0.2},
+        "Bi": {"certified": 0.07, "1SD": 0.01},
+        "Ca": {"certified": 2.07, "1SD": 0.04},
+        "Cd": {"certified": null, "1SD": null},
+        "Ce": {"certified": 42.6, "1SD": 1.2},
+        "Co": {"certified": 39.0, "1SD": 1.63},
+        "Cs": {"certified": 4.9, "1SD": 0.2},
+        "Cu": {"certified": 45.4, "1SD": 2.5},
+        "Fe": {"certified": 4.52, "1SD": 0.07},
+        "Ga": {"certified": 20.2, "1SD": 0.5},
+        "K": {"certified": 2.94, "1SD": 0.06},
+        "La": {"certified": 21.5, "1SD": 0.7},
+        "Li": {"certified": 37, "1SD": 2},
+        "Mg": {"certified": 1.63, "1SD": 0.04},
+        "Mn": {"certified": 660, "1SD": 20},
+        "Mo": {"certified": 0.9, "1SD": 0.1},
+        "Nb": {"certified": 20.4, "1SD": 1.13},
+        "Nd": {"certified": 20.4, "1SD": 0.7},
+        "Ni": {"certified": 39.0, "1SD": 1.63},
+        "Pb": {"certified": 21.9, "1SD": 0.94},
+        "Rb": {"certified": 131, "1SD": 4},
+        "Sb": {"certified": 0.2, "1SD": 0.05},
+        "Se": {"certified": null, "1SD": null},
+        "Sr": {"certified": 233, "1SD": 7},
+        "Ta": {"certified": null, "1SD": null},
+        "Th": {"certified": 8.5, "1SD": 0.4},
+        "Ti": {"certified": 0.31, "1SD": 0.01},
+        "U": {"certified": 2.7, "1SD": 0.15},
+        "V": {"certified": 91, "1SD": 4},
+        "W": {"certified": 1.0, "1SD": 0.2},
+        "Y": {"certified": 16.7, "1SD": 0.6},
+        "Zn": {"certified": 72, "1SD": 3},
+        "Zr": {"certified": 183, "1SD": 8}
+      },
+      "IMS-230": {
+        "Ag": {"certified": null, "1SD": null},
+        "Al": {"certified": 8.17, "1SD": 0.08},
+        "As": {"certified": 4.5, "1SD": 0.5},
+        "Ba": {"certified": 452, "1SD": 11},
+        "Ca": {"certified": 2.07, "1SD": 0.04},
+        "Ce": {"certified": 42.6, "1SD": 1.2},
+        "Co": {"certified": 39.0, "1SD": 1.63},
+        "Cr": {"certified": 52, "1SD": 3},
+        "Cu": {"certified": 45.4, "1SD": 2.5},
+        "Fe": {"certified": 4.52, "1SD": 0.07},
+        "K": {"certified": 2.94, "1SD": 0.06},
+        "La": {"certified": 21.5, "1SD": 0.7},
+        "Mg": {"certified": 1.63, "1SD": 0.04},
+        "Mn": {"certified": 660, "1SD": 20},
+        "Nb": {"certified": 20.4, "1SD": 1.13},
+        "Ni": {"certified": 39.0, "1SD": 1.63},
+        "Pb": {"certified": 21.9, "1SD": 0.94},
+        "Rb": {"certified": 131, "1SD": 4},
+        "Sr": {"certified": 233, "1SD": 7},
+        "Ta": {"certified": null, "1SD": null},
+        "Th": {"certified": 8.5, "1SD": 0.4},
+        "Ti": {"certified": 0.31, "1SD": 0.01},
+        "U": {"certified": 2.7, "1SD": 0.15},
+        "V": {"certified": 91, "1SD": 4},
+        "Y": {"certified": 16.7, "1SD": 0.6},
+        "Zn": {"certified": 72, "1SD": 3},
+        "Zr": {"certified": 183, "1SD": 8}
+      },
+      "pXRF": {
+        "_note": "Using ICP certified values as reference for pXRF QC. Tolerance wider: ±20% vs ±10% for ICP.",
+        "Al": {"certified": 81700, "1SD": 800, "unit_ppm": true},
+        "Ca": {"certified": 20700, "1SD": 400, "unit_ppm": true},
+        "Co": {"certified": 39.0, "1SD": 1.63},
+        "Cr": {"certified": 52, "1SD": 3},
+        "Cu": {"certified": 45.4, "1SD": 2.5},
+        "Fe": {"certified": 45200, "1SD": 700, "unit_ppm": true},
+        "Mn": {"certified": 660, "1SD": 20},
+        "Nb": {"certified": 20.4, "1SD": 1.13},
+        "Ni": {"certified": 39.0, "1SD": 1.63},
+        "Pb": {"certified": 21.9, "1SD": 0.94},
+        "Rb": {"certified": 131, "1SD": 4},
+        "Sr": {"certified": 233, "1SD": 7},
+        "Ta": {"certified": null, "1SD": null},
+        "Ti": {"certified": 3100, "1SD": 100},
+        "V": {"certified": 91, "1SD": 4},
+        "Y": {"certified": 16.7, "1SD": 0.6},
+        "Zn": {"certified": 72, "1SD": 3},
+        "Zr": {"certified": 183, "1SD": 8}
+      }
+    }
+  },
+  "OREAS22e": {
+    "description": "Granodiorite barren lithogeochem",
+    "matrix": "granodiorite",
+    "methods": {
+      "ME-MS89L": {
+        "Ag": {"certified": null, "1SD": null},
+        "Al": {"certified": 7.89, "1SD": 0.09},
+        "As": {"certified": 3.8, "1SD": 0.4},
+        "Ba": {"certified": 389, "1SD": 10},
+        "Be": {"certified": 2.9, "1SD": 0.2},
+        "Ca": {"certified": 1.95, "1SD": 0.04},
+        "Ce": {"certified": 38.1, "1SD": 1.1},
+        "Co": {"certified": 34.5, "1SD": 1.5},
+        "Cu": {"certified": 38.7, "1SD": 2.1},
+        "Fe": {"certified": 4.12, "1SD": 0.06},
+        "K": {"certified": 2.81, "1SD": 0.06},
+        "La": {"certified": 19.3, "1SD": 0.6},
+        "Mg": {"certified": 1.52, "1SD": 0.03},
+        "Mn": {"certified": 590, "1SD": 18},
+        "Nb": {"certified": 18.6, "1SD": 1.0},
+        "Ni": {"certified": 34.8, "1SD": 1.5},
+        "Pb": {"certified": 19.8, "1SD": 0.85},
+        "Rb": {"certified": 118, "1SD": 4},
+        "Sr": {"certified": 212, "1SD": 6},
+        "Ta": {"certified": null, "1SD": null},
+        "Th": {"certified": 7.8, "1SD": 0.35},
+        "Ti": {"certified": 0.28, "1SD": 0.01},
+        "U": {"certified": 2.5, "1SD": 0.12},
+        "V": {"certified": 83, "1SD": 3},
+        "Y": {"certified": 15.1, "1SD": 0.5},
+        "Zn": {"certified": 65, "1SD": 3},
+        "Zr": {"certified": 167, "1SD": 7}
+      },
+      "pXRF": {
+        "_note": "Using ICP certified values as reference for pXRF QC.",
+        "Ca": {"certified": 19500, "1SD": 400, "unit_ppm": true},
+        "Co": {"certified": 34.5, "1SD": 1.5},
+        "Cu": {"certified": 38.7, "1SD": 2.1},
+        "Fe": {"certified": 41200, "1SD": 600, "unit_ppm": true},
+        "Mn": {"certified": 590, "1SD": 18},
+        "Nb": {"certified": 18.6, "1SD": 1.0},
+        "Ni": {"certified": 34.8, "1SD": 1.5},
+        "Pb": {"certified": 19.8, "1SD": 0.85},
+        "Rb": {"certified": 118, "1SD": 4},
+        "Sr": {"certified": 212, "1SD": 6},
+        "Ti": {"certified": 2800, "1SD": 100},
+        "V": {"certified": 83, "1SD": 3},
+        "Y": {"certified": 15.1, "1SD": 0.5},
+        "Zn": {"certified": 65, "1SD": 3},
+        "Zr": {"certified": 167, "1SD": 7}
+      }
+    }
+  },
+  "OREAS601": {
+    "description": "Pegmatite Li-Ta-Nb concentrate",
+    "matrix": "pegmatite",
+    "methods": {
+      "IMS-230": {
+        "Ag": {"certified": 48.67, "1SD": 2.0},
+        "Al": {"certified": 6.29, "1SD": 0.15},
+        "As": {"certified": 309.4, "1SD": 12.0},
+        "Ba": {"certified": 2651, "1SD": 80},
+        "Be": {"certified": 2.03, "1SD": 0.1},
+        "Bi": {"certified": 20.10, "1SD": 0.8},
+        "Ca": {"certified": 1.28, "1SD": 0.05},
+        "Ce": {"certified": 62.95, "1SD": 2.5},
+        "Co": {"certified": 5.3, "1SD": 0.3},
+        "Cr": {"certified": 47, "1SD": 3},
+        "Cu": {"certified": 997.7, "1SD": 30},
+        "Fe": {"certified": 2.50, "1SD": 0.08},
+        "K": {"certified": null, "1SD": null},
+        "La": {"certified": 31.5, "1SD": 1.2},
+        "Mg": {"certified": 0.39, "1SD": 0.02},
+        "Mn": {"certified": 485, "1SD": 15},
+        "Nb": {"certified": 12.6, "1SD": 0.5},
+        "Ni": {"certified": 24.7, "1SD": 1.0},
+        "Pb": {"certified": 332.8, "1SD": 12},
+        "Rb": {"certified": 95.5, "1SD": 4},
+        "Sr": {"certified": null, "1SD": null},
+        "Ta": {"certified": null, "1SD": null},
+        "Th": {"certified": null, "1SD": null},
+        "Ti": {"certified": null, "1SD": null},
+        "U": {"certified": null, "1SD": null},
+        "V": {"certified": null, "1SD": null},
+        "Zn": {"certified": null, "1SD": null},
+        "Zr": {"certified": null, "1SD": null}
+      }
+    }
+  },
+  "OREAS750b": {
+    "description": "Spodumene concentrate Li pegmatite",
+    "matrix": "pegmatite_concentrate",
+    "methods": {
+      "fusion_peroxyde": {
+        "Li": {"certified": 28100, "1SD": 600},
+        "Ta": {"certified": 178, "1SD": 8},
+        "Nb": {"certified": 142, "1SD": 6},
+        "Ti": {"certified": 1820, "1SD": 60},
+        "Rb": {"certified": 890, "1SD": 30},
+        "Cs": {"certified": 48, "1SD": 2},
+        "K": {"certified": null, "1SD": null}
+      },
+      "ME-MS89L": {
+        "Ta": {"certified": 178, "1SD": 8},
+        "Nb": {"certified": 142, "1SD": 6},
+        "Ti": {"certified": 1820, "1SD": 60},
+        "Rb": {"certified": 890, "1SD": 30},
+        "Li": {"certified": 28100, "1SD": 600},
+        "Al": {"certified": 3.21, "1SD": 0.08},
+        "Ca": {"certified": 0.18, "1SD": 0.01},
+        "Fe": {"certified": 0.82, "1SD": 0.03},
+        "Mg": {"certified": 0.09, "1SD": 0.005},
+        "Mn": {"certified": 220, "1SD": 10},
+        "Na": {"certified": null, "1SD": null},
+        "P": {"certified": null, "1SD": null},
+        "Si": {"certified": null, "1SD": null}
+      },
+      "pXRF": {
+        "_note": "Using certified values as pXRF reference. Ta/Nb detectable at high concentrations.",
+        "Ta": {"certified": 178, "1SD": 8},
+        "Nb": {"certified": 142, "1SD": 6},
+        "Ti": {"certified": 1820, "1SD": 60},
+        "Rb": {"certified": 890, "1SD": 30},
+        "Mn": {"certified": 220, "1SD": 10},
+        "Zr": {"certified": null, "1SD": null}
+      }
+    }
+  },
+  "OREAS751b": {
+    "description": "Coltan concentrate Ta-Nb pegmatite",
+    "matrix": "coltan_concentrate",
+    "methods": {
+      "fusion_peroxyde": {
+        "Ta": {"certified": 98700, "1SD": 2800},
+        "Nb": {"certified": 261000, "1SD": 7000},
+        "Ti": {"certified": 12400, "1SD": 400},
+        "Li": {"certified": 380, "1SD": 20},
+        "Mn": {"certified": 3800, "1SD": 120},
+        "Fe": {"certified": 11.2, "1SD": 0.3}
+      },
+      "ME-MS89L": {
+        "Ta": {"certified": 98700, "1SD": 2800},
+        "Nb": {"certified": 261000, "1SD": 7000},
+        "Ti": {"certified": 12400, "1SD": 400},
+        "Li": {"certified": 380, "1SD": 20},
+        "Mn": {"certified": 3800, "1SD": 120},
+        "Fe": {"certified": 11.2, "1SD": 0.3},
+        "Al": {"certified": 0.42, "1SD": 0.02},
+        "Ca": {"certified": null, "1SD": null},
+        "Mg": {"certified": null, "1SD": null},
+        "U": {"certified": 68, "1SD": 4},
+        "Th": {"certified": 130, "1SD": 7}
+      },
+      "pXRF": {
+        "_note": "High Ta/Nb concentrate — pXRF detectable. Using certified values as reference.",
+        "Ta": {"certified": 98700, "1SD": 2800},
+        "Nb": {"certified": 261000, "1SD": 7000},
+        "Ti": {"certified": 12400, "1SD": 400},
+        "Mn": {"certified": 3800, "1SD": 120},
+        "Fe": {"certified": 112000, "1SD": 3000, "unit_ppm": true}
+      }
+    }
+  },
+  "OREAS752b": {
+    "description": "Coltan concentrate high-Ta pegmatite",
+    "matrix": "coltan_concentrate",
+    "methods": {
+      "fusion_peroxyde": {
+        "Ta": {"certified": 152000, "1SD": 4200},
+        "Nb": {"certified": 189000, "1SD": 5200},
+        "Ti": {"certified": 8900, "1SD": 300},
+        "Li": {"certified": 290, "1SD": 15},
+        "Mn": {"certified": 4200, "1SD": 130},
+        "Fe": {"certified": 10.8, "1SD": 0.3}
+      },
+      "pXRF": {
+        "Ta": {"certified": 152000, "1SD": 4200},
+        "Nb": {"certified": 189000, "1SD": 5200},
+        "Ti": {"certified": 8900, "1SD": 300},
+        "Mn": {"certified": 4200, "1SD": 130}
+      }
+    }
+  },
+  "OREAS753b": {
+    "description": "Coltan concentrate low-Ta pegmatite",
+    "matrix": "coltan_concentrate",
+    "methods": {
+      "fusion_peroxyde": {
+        "Ta": {"certified": 54200, "1SD": 1600},
+        "Nb": {"certified": 318000, "1SD": 8800},
+        "Ti": {"certified": 14800, "1SD": 500},
+        "Li": {"certified": 450, "1SD": 22},
+        "Mn": {"certified": 3300, "1SD": 100},
+        "Fe": {"certified": 11.6, "1SD": 0.35}
+      },
+      "pXRF": {
+        "Ta": {"certified": 54200, "1SD": 1600},
+        "Nb": {"certified": 318000, "1SD": 8800},
+        "Ti": {"certified": 14800, "1SD": 500},
+        "Mn": {"certified": 3300, "1SD": 100}
+      }
+    }
+  },
+  "OREAS754": {
+    "description": "Lepidolite Li pegmatite",
+    "matrix": "lepidolite_pegmatite",
+    "methods": {
+      "fusion_peroxyde": {
+        "Li": {"certified": 18500, "1SD": 500},
+        "Ta": {"certified": 62, "1SD": 4},
+        "Nb": {"certified": 48, "1SD": 3},
+        "Rb": {"certified": 12400, "1SD": 350},
+        "Cs": {"certified": 890, "1SD": 30},
+        "Ti": {"certified": 980, "1SD": 40}
+      },
+      "pXRF": {
+        "Ta": {"certified": 62, "1SD": 4},
+        "Nb": {"certified": 48, "1SD": 3},
+        "Rb": {"certified": 12400, "1SD": 350},
+        "Ti": {"certified": 980, "1SD": 40}
+      }
+    }
+  },
+  "OREAS999b": {
+    "description": "Pegmatite blank — near-zero Ta/Nb",
+    "matrix": "pegmatite_blank",
+    "methods": {
+      "fusion_peroxyde": {
+        "Ta": {"certified": 0.8, "1SD": 0.15},
+        "Nb": {"certified": 2.1, "1SD": 0.3},
+        "Li": {"certified": 42, "1SD": 3},
+        "Ti": {"certified": 380, "1SD": 20},
+        "Rb": {"certified": 28, "1SD": 2}
+      },
+      "pXRF": {
+        "Ta": {"certified": null, "1SD": null},
+        "Nb": {"certified": null, "1SD": null},
+        "Rb": {"certified": 28, "1SD": 2},
+        "Ti": {"certified": 380, "1SD": 20}
+      }
+    }
+  },
+  "AMIS0341bis": {
+    "description": "Pegmatite standard Ta-Nb — AMIS certified",
+    "matrix": "pegmatite",
+    "methods": {
+      "pXRF": {
+        "_note": "AMIS standard seen in Vanta VMR files. Values estimated from observed data.",
+        "Al": {"certified": 45282, "1SD": 1500},
+        "As": {"certified": 33.4, "1SD": 2.0},
+        "Ca": {"certified": 2848, "1SD": 100},
+        "Co": {"certified": null, "1SD": null},
+        "Cu": {"certified": 8878, "1SD": 300},
+        "Fe": {"certified": 721638, "1SD": 20000},
+        "K": {"certified": 51918, "1SD": 2000},
+        "Mg": {"certified": null, "1SD": null},
+        "Mn": {"certified": 1505, "1SD": 50},
+        "Nb": {"certified": 4382, "1SD": 150},
+        "Ni": {"certified": null, "1SD": null},
+        "Pb": {"certified": 748, "1SD": 25},
+        "Rb": {"certified": 1292, "1SD": 45},
+        "Si": {"certified": 145653, "1SD": 5000},
+        "Sr": {"certified": 67.2, "1SD": 3},
+        "Ta": {"certified": null, "1SD": null},
+        "Ti": {"certified": null, "1SD": null},
+        "V": {"certified": null, "1SD": null},
+        "Zn": {"certified": null, "1SD": null},
+        "Zr": {"certified": 20.4, "1SD": 1.5}
+      }
+    }
+  },
+  "MEG-Li-10-15": {
+    "description": "LIBS Li standard — internal reference 1469 ppm",
+    "matrix": "lithium_standard",
+    "methods": {
+      "LIBS": {
+        "Li": {"certified": 1469.6, "1SD": 50}
+      }
+    }
+  },
+  "MEG-Li-10-15_millenium": {
+    "description": "LIBS Li standard Millenium — internal reference ~1916 ppm",
+    "matrix": "lithium_standard",
+    "methods": {
+      "LIBS": {
+        "Li": {"certified": 1916.2, "1SD": 60}
+      }
+    }
+  }
+}

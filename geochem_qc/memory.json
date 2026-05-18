@@ -1,0 +1,23 @@
+{
+  "formats": {},
+  "crm_patterns": {
+    "OREAS20a": ["oreas20a", "oreas 20a", "or20a", "oreas-20a", "oreas_20a"],
+    "OREAS22e": ["oreas22e", "oreas 22e", "or22e", "oreas-22e"],
+    "OREAS601": ["oreas601", "oreas 601", "or601", "oreas-601"],
+    "OREAS750b": ["oreas750b", "oreas 750b", "or750b", "oreas-750b", "oreas750"],
+    "OREAS751b": ["oreas751b", "oreas 751b", "or751b", "oreas-751b", "oreas751"],
+    "OREAS752b": ["oreas752b", "oreas 752b", "or752b", "oreas-752b"],
+    "OREAS753b": ["oreas753b", "oreas 753b", "or753b", "oreas-753b"],
+    "OREAS754": ["oreas754", "oreas 754", "or754", "oreas-754"],
+    "OREAS999b": ["oreas999b", "oreas 999b", "or999b", "oreas-999b"],
+    "AMIS0341bis": ["amis0341bis", "amis0341", "amis 0341", "amis-0341"],
+    "MEG-Li-10-15": ["meg-li-10-15", "meg li", "meg-li", "megli1015", "megli"],
+    "BLK": ["blk", "blank", "field blank", "process blank"]
+  },
+  "zones": {
+    "ISSIA": {"sm_min": 1, "sm_max": 9999},
+    "TIASSALE": {"sm_min": 10000, "sm_max": 19999},
+    "BOUAKE": {"sm_min": 20000, "sm_max": 29999}
+  },
+  "pxrf_baselines": {}
+}

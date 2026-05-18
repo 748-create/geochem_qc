@@ -1,0 +1,15 @@
+{
+  "_note": "Add your custom/in-house CRMs here. Same structure as oreas_certified.json",
+  "_example": {
+    "MY_STD_01": {
+      "description": "Internal standard description",
+      "matrix": "soil",
+      "methods": {
+        "pXRF": {
+          "Ta": {"certified": 45.0, "1SD": 3.0},
+          "Nb": {"certified": 120.0, "1SD": 8.0}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "formats": {
+    "7ac681a6020673d6": {
+      "format": "Bruker_Vanta_VMR_pXRF",
+      "method_type": "pXRF",
+      "instrument": "Bruker Vanta VMR",
+      "source_file": "1779042678218_Issia_Auger_Guggenex_XRF_Data_251124_From_SM004835_TO_SM005578.csv",
+      "nb_fois": 2
+    },
+    "4ecf3537c7b20cba": {
+      "format": "ALS_MSALabs_ICP_XLS",
+      "method_type": "ICP-MS",
+      "instrument": "ICP-MS",
+      "source_file": "1779042678218_YM24079634.XLS",
+      "nb_fois": 2
+    },
+    "bae6e696a249371c": {
+      "format": "Olympus_Vanta_pXRF",
+      "method_type": "pXRF",
+      "instrument": "Olympus Vanta",
+      "source_file": "1779042652337_raw_data_soils_Tiassalé_PR0935_PR0943_2025_12_01.xlsx",
+      "nb_fois": 1
+    },
+    "9b7eda308165d23f": {
+      "format": "Olympus_Vanta_pXRF",
+      "method_type": "pXRF",
+      "instrument": "Olympus Vanta",
+      "source_file": "1779042652339_raw_data_soils_Issia_PR0895_2026-02-22.csv",
+      "nb_fois": 1
+    },
+    "0894a54fbf7aef98": {
+      "format": "Bruker_Vanta_VMR_pXRF",
+      "method_type": "pXRF",
+      "instrument": "Bruker Vanta VMR",
+      "source_file": "1779042678219__BAG1-BAG6-results001_240424_GUGGERNEX_124.csv",
+      "nb_fois": 1
+    },
+    "bdde0dbd7677c1ad": {
+      "format": "SciAps_LIBS",
+      "method_type": "LIBS",
+      "instrument": "SciAps LIBS",
+      "source_file": "1779042678219_Guggenex_Libs_Analysis_Data_Bag_1_to_Bag_6__Issia_Project_2024_07_02.csv",
+      "nb_fois": 1
+    },
+    "c0533bca44374fe5": {
+      "format": "SciAps_LIBS",
+      "method_type": "LIBS",
+      "instrument": "SciAps LIBS",
+      "source_file": "1779042678220_Millenium_Libs_Analysis_Data_Bag_36_to_Bag_41_Tiassalé_Project_2024_08_23.csv",
+      "nb_fois": 1
+    },
+    "3dd965dc6d1269e7": {
+      "format": "MSALABS_multiblock_CSV",
+      "method_type": "ICP-MS",
+      "instrument": "ICP-MS",
+      "source_file": "1779042678220_YAM2210766.csv",
+      "nb_fois": 1
+    }
+  },
+  "crm_patterns": {},
+  "zones": {}
+}
