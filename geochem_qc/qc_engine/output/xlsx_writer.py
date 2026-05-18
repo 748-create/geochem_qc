@@ -293,7 +293,8 @@ def _write_data_clean(wb: Workbook, df: pd.DataFrame, cfg: dict):
     ws.row_dimensions[1].height = 30
     title_cell = ws.cell(row=1, column=1, value='GeoQC Pro — DATA CLEAN')
     title_cell.font = Font(name='Calibri', bold=True, size=14, color=COLORS['navy'])
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=min(len(headers), 10))
+    n_cols = max(1, min(len(headers), 10))
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=n_cols)
 
     _write_header_row(ws, 2, headers, COLORS['navy'])
     ws.row_dimensions[2].height = 22
@@ -569,7 +570,7 @@ def _write_qc_lab(wb: Workbook, df_lab: pd.DataFrame, cfg: dict):
     They are displayed for reference but not used for validation.
     """
     ws = wb.create_sheet('QC_LABO')
-    ws.sheet_properties.tabColor = TAB_COLORS['gray']
+    ws.sheet_properties.tabColor = COLORS['muted']
     
     elem_prio = cfg.get('elements_prioritaires', ['Ta', 'Nb', 'Ti', 'Rb'])
     

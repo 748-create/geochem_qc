@@ -22,6 +22,7 @@ from qc_engine.core.pre_analysis import run_pre_analysis
 from qc_engine.qc.duplicates import run_duplicates_qc
 from qc_engine.qc.blanks import run_blanks_qc
 from qc_engine.qc.standards import run_standards_qc
+from qc_engine.qc.qc_lab_engine import validate_lab_qc
 from qc_engine.memory.historique import save_batch, list_batches
 from qc_engine.output.xlsx_writer import write_xlsx
 from qc_engine.output.pdf_writer import write_pdf
@@ -123,7 +124,7 @@ def run_pipeline(
             zone = pre.get('zones', {})
             zone = _infer_zone_from_df(df_tes)
 
-        # ── STEP 8: QC modules (TES only - LAB QC is informational) ───────────
+        # ── STEP 8: QC modules (TES only - LAB QC is validated separately) ───────────
         _progress(55, "Running duplicate QC...")
         dup_results = run_duplicates_qc(df_tes, log=log)
 
@@ -133,11 +134,42 @@ def run_pipeline(
         _progress(72, "Running standards QC...")
         std_results = run_standards_qc(df_tes, log=log)
 
+        # Validation des QC Labo (si présents)
+        lab_qc_results = {}
+        if df_lab is not None and not df_lab.empty:
+            _progress(75, "Validating Lab QC against certified values...")
+            # Charger la base CRM
+            import json
+            try:
+                with open(BASE_DIR / 'data' / 'oreas_certified.json') as f:
+                    crm_db = json.load(f)
+            except:
+                crm_db = {}
+            # Ajouter les CRMs custom si existants
+            try:
+                with open(BASE_DIR / 'data' / 'crm_custom.json') as f:
+                    crm_db.update(json.load(f))
+            except:
+                pass
+            
+            config_path = BASE_DIR / 'config.json'
+            config = {}
+            try:
+                with open(config_path) as f:
+                    config = json.load(f)
+            except:
+                config = {"elements_actifs": ["Ta", "Nb", "Ti", "Rb"], "methode_defaut": "4-acides"}
+            
+            lab_qc_results = validate_lab_qc(df_lab, crm_db, config)
+        else:
+            lab_qc_results = {"status": "NO_DATA"}
+
         qc_results = {
             'duplicates': dup_results,
             'blanks': blk_results,
             'standards': std_results,
-            'lab_qc_stats': lab_stats,  # Stats sur les QC labo (informatif)
+            'lab_qc_stats': lab_stats,  # Stats brutes sur les QC labo
+            'lab_qc_validation': lab_qc_results  # Résultats de la validation
         }
 
         # ── STEP 9: Mode-specific modules (only A, B, D are active) ───────────
@@ -173,7 +205,8 @@ def run_pipeline(
         # ── STEP 13: Generate PDF ─────────────────────────────────────────────
         _progress(94, "Generating PDF report...")
         pdf_path = write_pdf(df_tes, qc_results, completeness, mode=mode,
-                              output_dir=OUTPUT_DIR, zone=zone)
+                              output_dir=OUTPUT_DIR, zone=zone,
+                              df_lab=df_lab if not df_lab.empty else None)
         output_files['pdf'] = pdf_path
         log.append(f"✓ PDF: {Path(pdf_path).name}")
 
