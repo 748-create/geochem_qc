@@ -15,6 +15,7 @@ OUTPUT_DIR = BASE_DIR / "output"
 # ─── Imports ─────────────────────────────────────────────────────────────────
 from qc_engine.core.parser import parse_file, parse_multiple_files
 from qc_engine.core.merger import parse_dispatch, merge_dispatch_and_results
+from qc_engine.core.separator import separate_qc, identify_lab_qc
 from qc_engine.core.cleaner import clean_data
 from qc_engine.core.completeness import score_completeness
 from qc_engine.core.pre_analysis import run_pre_analysis
@@ -97,69 +98,64 @@ def run_pipeline(
         if conflict_resolutions:
             df = _apply_resolutions(df, conflict_resolutions, log)
 
+        # ── STEP 4b: Separate TES QC from LAB QC ─────────────────────────────
+        _progress(32, "Separating TES QC from LAB QC...")
+        sep_result = separate_qc(df, log=log)
+        df_tes = sep_result['df_tes']
+        df_lab = sep_result['df_lab']
+        lab_stats = sep_result['stats']
+
         # ── STEP 5: Pre-analysis (returned for UI display) ────────────────────
-        _progress(30, "Running pre-analysis...")
-        pre = run_pre_analysis(df, parsed['files'], log=log)
+        _progress(35, "Running pre-analysis...")
+        pre = run_pre_analysis(df_tes, parsed['files'], log=log)
+        pre['lab_qc_stats'] = lab_stats
 
         # ── STEP 6: Clean data ───────────────────────────────────────────────
         _progress(40, "Cleaning data (LOD, outliers, physical checks)...")
-        df, cleaning_report = clean_data(df, log=log)
+        df_tes, cleaning_report = clean_data(df_tes, log=log)
 
         # ── STEP 7: Completeness score ────────────────────────────────────────
         _progress(45, "Scoring QC completeness...")
-        completeness = score_completeness(df, log=log)
+        completeness = score_completeness(df_tes, log=log)
 
         # Infer zone if not provided
         if not zone:
             zone = pre.get('zones', {})
-            zone = _infer_zone_from_df(df)
+            zone = _infer_zone_from_df(df_tes)
 
-        # ── STEP 8: QC modules ────────────────────────────────────────────────
+        # ── STEP 8: QC modules (TES only - LAB QC is informational) ───────────
         _progress(55, "Running duplicate QC...")
-        dup_results = run_duplicates_qc(df, log=log)
+        dup_results = run_duplicates_qc(df_tes, log=log)
 
         _progress(65, "Running blank QC...")
-        blk_results = run_blanks_qc(df, log=log)
+        blk_results = run_blanks_qc(df_tes, log=log)
 
         _progress(72, "Running standards QC...")
-        std_results = run_standards_qc(df, log=log)
+        std_results = run_standards_qc(df_tes, log=log)
 
         qc_results = {
             'duplicates': dup_results,
             'blanks': blk_results,
             'standards': std_results,
+            'lab_qc_stats': lab_stats,  # Stats sur les QC labo (informatif)
         }
 
-        # ── STEP 9: Mode-specific modules ────────────────────────────────────
+        # ── STEP 9: Mode-specific modules (only A, B, D are active) ───────────
         _progress(78, f"Running Mode {mode} specific analysis...")
         mode_results = {}
         if mode == 'B':
             from qc_engine.modes.mode_b_runs import run_mode_b
-            mode_results = run_mode_b(df, log=log)
-        elif mode == 'C':
-            from qc_engine.modes.mode_c_methodes import run_mode_c
-            mode_results = run_mode_c(df, log=log)
+            mode_results = run_mode_b(df_tes, log=log)
         elif mode == 'D':
             from qc_engine.modes.mode_d_labos import run_mode_d
-            mode_results = run_mode_d(df, log=log)
-        elif mode == 'E':
-            from qc_engine.modes.mode_e_ajout import run_mode_e
-            mode_results = run_mode_e(df, log=log)
-        elif mode == 'F':
-            from qc_engine.modes.mode_f_recalcul import run_mode_f
-            mode_results = run_mode_f(df, log=log)
-        elif mode == 'G':
-            from qc_engine.modes.mode_g_composite import run_mode_g
-            mode_results = run_mode_g(df, log=log)
-        elif mode == 'H':
-            from qc_engine.modes.mode_h_campagnes import run_mode_h
-            mode_results = run_mode_h(df, log=log)
+            mode_results = run_mode_d(df_tes, log=log)
+        # Modes C, E, F, G, H ont été retirés de l'UI car redondants ou non utilisés
 
         qc_results.update(mode_results)
 
         # ── STEP 10: Save to history ──────────────────────────────────────────
         _progress(82, "Saving batch to history...")
-        batch_filename = save_batch(df, qc_results, mode=mode, zone=zone)
+        batch_filename = save_batch(df_tes, qc_results, mode=mode, zone=zone)
         log.append(f"✓ Batch archived: {batch_filename}")
 
         # ── STEP 11: Load history for HISTORIQUE sheet ────────────────────────
@@ -168,14 +164,15 @@ def run_pipeline(
         # ── STEP 12: Generate XLSX ────────────────────────────────────────────
         _progress(87, "Generating XLSX report...")
         OUTPUT_DIR.mkdir(exist_ok=True)
-        xlsx_path = write_xlsx(df, qc_results, mode=mode,
-                                output_dir=OUTPUT_DIR, zone=zone, batches=batches)
+        xlsx_path = write_xlsx(df_tes, qc_results, mode=mode,
+                                output_dir=OUTPUT_DIR, zone=zone, batches=batches,
+                                df_lab=df_lab if not df_lab.empty else None)
         output_files['xlsx'] = xlsx_path
         log.append(f"✓ XLSX: {Path(xlsx_path).name}")
 
         # ── STEP 13: Generate PDF ─────────────────────────────────────────────
         _progress(94, "Generating PDF report...")
-        pdf_path = write_pdf(df, qc_results, completeness, mode=mode,
+        pdf_path = write_pdf(df_tes, qc_results, completeness, mode=mode,
                               output_dir=OUTPUT_DIR, zone=zone)
         output_files['pdf'] = pdf_path
         log.append(f"✓ PDF: {Path(pdf_path).name}")

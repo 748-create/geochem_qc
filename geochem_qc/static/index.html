@@ -427,18 +427,12 @@ const state = {
 
 // ═══════════════════════════════════════════════════════════════════
 // MODES CONFIG
-// ═══════════════════════════════════════════════════════════════════
+// Seuls les modes utiles sont affichés. Les autres (C,E,F,G,H) ont été retirés car redondants ou non utilisés.
 const MODES = [
   { id:'A', name:'Nouveau batch', desc:'Traitement standard complet — pXRF, ICP, LIBS' },
-  { id:'B', name:'Comparer deux runs', desc:'Même batch réanalysé — détecter les dérives instrument' },
-  { id:'C', name:'Comparer deux méthodes', desc:'pXRF vs ICP / LIBS vs XRF — biais inter-méthodes' },
+  { id:'B', name:'Comparer deux runs', desc:'Même batch réanalysé — détecter les dérives instrumentales' },
   { id:'D', name:'Comparer deux labos', desc:'ALS vs MSALabs / même méthode — biais inter-labos' },
-  { id:'E', name:'Ajouter à un batch existant', desc:'Nouveaux résultats reçus — fusionner au batch' },
-  { id:'F', name:'Recalculer / Valider', desc:'Changer seuils ou regénérer les rapports' },
-  { id:'G', name:'Composite par puit', desc:'Agréger les couches par puit (pondération masse)' },
-  { id:'H', name:'Comparer deux campagnes', desc:'Même zone — périodes différentes' },
 ];
-
 const STEPS = [
   'Parsing fichiers', 'Lecture dispatch', 'Fusion données',
   'Nettoyage', 'Score QC', 'QC Duplicates',
@@ -727,10 +721,19 @@ function pollProgress() {
   const interval = setInterval(async () => {
     try {
       const res = await fetch('/api/progress/' + state.jobId);
+      
+      // Check if response is HTML instead of JSON
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned HTML instead of JSON - possible server crash');
+      }
+      
       const data = await res.json();
 
       updateProgress(data.progress, data.message);
-      if (data.message) appendLog(data.message);
+      if (data.message && data.message.includes('Generating')) {
+        appendLog(data.message);
+      }
 
       if (data.status === 'done' || data.status === 'error') {
         clearInterval(interval);
@@ -743,7 +746,15 @@ function pollProgress() {
       }
     } catch(e) {
       clearInterval(interval);
-      appendLog('❌ Erreur polling: ' + e.message, 'error');
+      console.error('Polling error:', e);
+      appendLog('❌ Erreur: ' + e.message + '. Vérifiez la console serveur pour plus de détails.', 'error');
+      
+      // Show button to retry or go back
+      const retryBtn = document.createElement('button');
+      retryBtn.className = 'btn btn-secondary';
+      retryBtn.textContent = '↻ Réessayer';
+      retryBtn.onclick = () => location.reload();
+      document.querySelector('.log-panel').appendChild(retryBtn);
     }
   }, 800);
 }
