@@ -60,6 +60,9 @@ def _fig_to_image(fig, width_cm=16, height_cm=8) -> Image:
 
 def _make_summary_chart(df: pd.DataFrame, elements: list) -> plt.Figure:
     """Box plot of priority elements in ORIG samples."""
+    if df.empty or 'SampleType' not in df.columns:
+        return None
+        
     orig = df[df['SampleType'] == 'ORIG']
     data = []
     labels = []
@@ -138,7 +141,8 @@ def _make_qc_summary_chart(qc_results: dict) -> plt.Figure:
 
 
 def write_pdf(df: pd.DataFrame, qc_results: dict, completeness: dict,
-              mode: str, output_dir: Path, zone: str = None) -> str:
+              mode: str, output_dir: Path, zone: str = None,
+              df_lab: pd.DataFrame = None) -> str:
     """Write PDF report. Returns filepath."""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -182,14 +186,21 @@ def write_pdf(df: pd.DataFrame, qc_results: dict, completeness: dict,
     story.append(Paragraph(f'QC Completeness Score: <b>{score}</b>', style_h2))
 
     # Counts table
+    n_lab_qc = len(df_lab) if df_lab is not None and not df_lab.empty else 0
+    n_lab_blk = len(df_lab[df_lab['QAQCType'] == 'BLK']) if (df_lab is not None and not df_lab.empty and 'QAQCType' in df_lab.columns) else 0
+    n_lab_std = len(df_lab[df_lab['QAQCType'] == 'STD']) if (df_lab is not None and not df_lab.empty and 'QAQCType' in df_lab.columns) else 0
+    
     counts_data = [
         ['Category', 'Count', 'Rate'],
         ['ORIG samples', completeness.get('n_orig', 0), '—'],
         ['Duplicates (TES)', completeness.get('n_dup', 0), f"{completeness.get('dup_rate', 0):.1f}%"],
         ['Blanks (TES)', completeness.get('n_blk', 0), f"{completeness.get('blk_rate', 0):.1f}%"],
         ['Standards (TES)', completeness.get('n_std', 0), f"{completeness.get('std_rate', 0):.1f}%"],
-        ['Lab QC (info)', completeness.get('n_lab_qc', 0), 'Informational'],
+        ['Lab QC (info)', n_lab_qc, 'Informational'],
     ]
+    if n_lab_blk > 0 or n_lab_std > 0:
+        counts_data.append(['  └ Blancs labo', n_lab_blk, '—'])
+        counts_data.append(['  └ Standards labo', n_lab_std, '—'])
     t = Table(counts_data, colWidths=[7*cm, 4*cm, 4*cm])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), C_NAVY),
@@ -257,7 +268,11 @@ def write_pdf(df: pd.DataFrame, qc_results: dict, completeness: dict,
         story.append(_fig_to_image(summary_fig, width_cm=16, height_cm=8))
 
     # Stats table per element
-    orig = df[df['SampleType'] == 'ORIG']
+    if df.empty or 'SampleType' not in df.columns:
+        orig = pd.DataFrame()
+    else:
+        orig = df[df['SampleType'] == 'ORIG']
+    
     stats_rows = [['Element', 'N', 'Min', 'Mean', 'Median', 'P90', 'Max', 'Std Dev']]
     for el in elem_prio:
         col = f'{el}_ppm'
@@ -331,6 +346,87 @@ def write_pdf(df: pd.DataFrame, qc_results: dict, completeness: dict,
                         if p.get('overall_status') == 'FAIL']
             story.append(Paragraph(
                 f"→ Re-analyze duplicate pairs: {', '.join(fail_ids[:5])}", style_body))
+
+    # ── PAGE X: Lab QC Validation Results (if available) ───────────────────────
+    lab_val = qc_results.get('lab_qc_validation', {})
+    if lab_val and lab_val.get('status') != 'NO_DATA':
+        story.append(PageBreak())
+        story.append(Paragraph('Laboratory QC Validation', style_h1))
+        story.append(HRFlowable(width='100%', thickness=2, color=C_CYAN))
+        story.append(Spacer(1, 0.3*cm))
+        
+        # Summary status
+        lab_summary = lab_val.get('summary', {})
+        lab_status = lab_summary.get('status', 'UNKNOWN')
+        lab_text = lab_summary.get('text', 'No summary available')
+        story.append(Paragraph(f"Status: <b>{lab_status}</b> — {lab_text}", style_body))
+        story.append(Spacer(1, 0.3*cm))
+        
+        # Standards validation table
+        std_df = lab_val.get('standards', pd.DataFrame())
+        if isinstance(std_df, pd.DataFrame) and not std_df.empty:
+            story.append(Paragraph('Standards Recovery Analysis', style_h2))
+            std_rows = [['Sample ID', 'CRM', 'Element', 'Measured', 'Certified', 'Recovery %', 'Z-Score', 'Status']]
+            for _, row in std_df.iterrows():
+                status_color = C_PASS if row['Status'] == 'PASS' else C_WARN if row['Status'] == 'WARN' else C_FAIL
+                std_rows.append([
+                    str(row['SampleID']), str(row['CRM']), str(row['Element']),
+                    f"{row['Measured']:.3f}", f"{row['Certified']:.3f}",
+                    f"{row['Recovery_%']:.1f}", f"{row['Z_Score']:.2f}",
+                    row['Status']
+                ])
+            
+            std_table = Table(std_rows, colWidths=[2.5*cm, 2*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.5*cm, 1.5*cm])
+            std_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), C_NAVY),
+                ('TEXTCOLOR', (0,0), (-1,0), white),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,-1), 8),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ('ALIGN', (3,0), (-1,-1), 'RIGHT'),
+                ('ALIGN', (7,0), (7,-1), 'CENTER'),
+            ]))
+            # Color code status column
+            for ri, row in enumerate(std_rows[1:], start=1):
+                bg = C_PASS if row[-1] == 'PASS' else C_WARN if row[-1] == 'WARN' else C_FAIL
+                std_table.setStyle(TableStyle([('BACKGROUND', (7, ri), (7, ri), bg)]))
+            
+            story.append(std_table)
+            story.append(Spacer(1, 0.3*cm))
+        
+        # Duplicates validation
+        dup_df = lab_val.get('duplicates', pd.DataFrame())
+        if isinstance(dup_df, pd.DataFrame) and not dup_df.empty:
+            story.append(Paragraph('Duplicates Precision Analysis', style_h2))
+            dup_rows = [['Pair ID', 'Element', 'Value 1', 'Value 2', 'RPD %', 'Status']]
+            for _, row in dup_df.iterrows():
+                dup_rows.append([
+                    str(row['Pair_ID']), str(row['Element']),
+                    f"{row['Val_1']:.3f}", f"{row['Val_2']:.3f}",
+                    f"{row['RPD_%']:.1f}", row['Status']
+                ])
+            
+            dup_table = Table(dup_rows, colWidths=[2.5*cm, 2*cm, 2*cm, 2*cm, 2*cm, 2*cm])
+            dup_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), C_NAVY),
+                ('TEXTCOLOR', (0,0), (-1,0), white),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0,0), (-1,-1), 8),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+                ('ALIGN', (2,0), (-1,-1), 'RIGHT'),
+                ('ALIGN', (5,0), (5,-1), 'CENTER'),
+            ]))
+            story.append(dup_table)
+            story.append(Spacer(1, 0.3*cm))
+        
+        # Flags / Warnings
+        flags = lab_val.get('flags', [])
+        if flags:
+            story.append(Paragraph('Observations', style_h2))
+            for flag in flags[:10]:  # Limiter à 10 pour ne pas surcharger
+                story.append(Paragraph(f"• {flag}", style_warn))
+            if len(flags) > 10:
+                story.append(Paragraph(f"... et {len(flags) - 10} autres observations (voir XLSX)", style_body))
 
     story.append(Spacer(1, 0.5*cm))
     story.append(Paragraph(
